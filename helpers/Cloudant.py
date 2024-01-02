@@ -2,8 +2,6 @@ from datetime import datetime, timedelta, timezone
 
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibmcloudant.cloudant_v1 import CloudantV1
-from typing import Any
-import json
 import os
 import load_dotenv
 
