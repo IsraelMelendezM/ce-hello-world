@@ -4,7 +4,8 @@ from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibmcloudant.cloudant_v1 import CloudantV1
 from typing import Any
 import json
-
+import os
+import load_dotenv
 
 def offset_days(dt:datetime = None, days:int =0):
     return dt + timedelta(days=days)
@@ -64,22 +65,18 @@ def get_doc_by_key(
 
 class GetClientDetails:
     def __init__(self) :
-        with open('env-variables.json') as creds:
-            credentials = json.loads(creds.read())
-        print(credentials)
+
+        load_dotenv()
+
+        credentials = {'CLOUDANT_API_KEY':os.environ("CLOUDANT_API_KEY"),
+                        'CLOUDANT_URL':os.environ("CLOUDANT_URL")}
+        
         authenticator = IAMAuthenticator(credentials['CLOUDANT_API_KEY'])
         self.client = CloudantV1(authenticator=authenticator)
         self.client.set_service_url(credentials['CLOUDANT_URL'])
 
         print("Connected to Cloudant")
-        # return self.client
 
-
-    # def get_doc_by_key(self,
-    #         ddoc: str, 
-    #         view: str, 
-    #         key: str , 
-    #         dbName: str ):
     def get_doc_by_key(self, dbName, ddoc, key, view):
 
         try:
