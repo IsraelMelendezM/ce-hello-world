@@ -133,7 +133,7 @@ async def auth(request_data: AuthRequest):
         "validation_msg": validationMsg
     }
 
-port = os.getenv('VCAP_APP_PORT', '8080')
+port = os.getenv('VCAP_APP_PORT', '80')
 if __name__ == "__main__":
     logger.debug("Starting the Application")
     app.run(host='0.0.0.0', port=port, debug=True, use_reloader=True)
