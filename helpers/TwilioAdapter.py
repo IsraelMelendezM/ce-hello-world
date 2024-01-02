@@ -1,6 +1,5 @@
 from twilio.rest import Client
-import json
-import load_dotenv
+from dotenv import load_dotenv
 import os
 
 class MessageClient:
@@ -9,9 +8,9 @@ class MessageClient:
         
         load_dotenv()
 
-        twilio_number =     os.environ("TRIAL_NUMBER")
-        twilio_account_sid =os.environ("TWILIO_ACCOUNT_SID")
-        twilio_auth_token = os.environ("TWILIO_AUTH_TOKEN")
+        twilio_number =     os.environ.get("TRIAL_NUMBER")
+        twilio_account_sid =os.environ.get("TWILIO_ACCOUNT_SID")
+        twilio_auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
         self.twilio_number = twilio_number
         self.twilio_client = Client(twilio_account_sid, twilio_auth_token)
 

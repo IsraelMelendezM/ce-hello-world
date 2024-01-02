@@ -3,16 +3,13 @@ import os
 import json
 from datetime import datetime
 from fastapi import FastAPI
-import requests
 from pprint import pprint 
 from pydantic import BaseModel
-import ibm_db
 
 from helpers.TwilioAdapter import MessageClient
 from helpers.OTPGenerator import Generate
 from helpers.Cloudant import GetClientDetails
 from helpers.Cloudant import sp_time, as_spanish, offset_days
-from typing import Any
 
 logger.basicConfig(level="DEBUG")
 
@@ -133,7 +130,7 @@ async def auth(request_data: AuthRequest):
         "validation_msg": validationMsg
     }
 
-port = os.getenv('VCAP_APP_PORT', '80')
+port = os.getenv('VCAP_APP_PORT', '8080')
 if __name__ == "__main__":
     logger.debug("Starting the Application")
     app.run(host='0.0.0.0', port=port, debug=True, use_reloader=True)
