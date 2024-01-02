@@ -1,8 +1,8 @@
 FROM python:3.9-slim
 
-WORKDIR /app
+WORKDIR /twilioOTP
 
-COPY . /app
+COPY . /twilioOTP/
 
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
