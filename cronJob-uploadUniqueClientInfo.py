@@ -1,30 +1,31 @@
 import os
 import json
 import requests
-# import multiprocessing
-
-# import watchdog.events
-# import watchdog.observers
 
 import time
 import pandas as pd
-import datetime;
- 
+import datetime
 
 import argparse
-
 
 from ibmcloudant.cloudant_v1 import CloudantV1, Document, BulkDocs
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
+import load_dotenv
+
+load_dotenv()
+load_dotenv()
+
+credentials = {'CLOUDANT_API_KEY':os.environ("CLOUDANT_API_KEY"),
+                'CLOUDANT_URL':os.environ("CLOUDANT_URL")}
+        
 ct = datetime.datetime.now()
 print("current time:-", ct)
-iam_api_key = "Ps3S4ZRaai0vR9tMsJczVViVcMvYv3Uo5RkLIs8KGVKc"
-authenticator = IAMAuthenticator(apikey=iam_api_key)
+authenticator = IAMAuthenticator(apikey=credentials['CLOUDANT_API_KEY'])
 
 # Create an instance of the Cloudant service with the authenticator
 service = CloudantV1(authenticator=authenticator)
-service.set_service_url("https://c7d59f0c-0133-49bd-bff1-78c5e87ce888-bluemix.cloudantnosqldb.appdomain.cloud")
+service.set_service_url(credentials['CLOUDANT_API_KEY'])
 
 # Define a function to send a POST request with JSON data
 def send_post_request(url, data, headers):
@@ -100,29 +101,17 @@ def get_credit_data(src_path):
 
 def save_data_Cloudant(src_path, client_APIdata, credit_APIdata, prod):
     # time.sleep(3)
-    ## client_data is a list of py dictionaries
-    # print()
-    # print(client_APIdata)
-    # print(credit_APIdata)
     print()
     # ct stores current time
     ct = datetime.datetime.now()
     print("current time:-", ct)
 
 
-    # client_ids = read_csv_clients(src_path)
-    ## TODO: list set to eliminate client duplicates, do for multiple clients
     records = []
-    # for idx, _ in enumerate(client_APIdata): [ [{}], [{}], [{}] ],  [{}]; [{}]
     for client, credit in zip(client_APIdata, credit_APIdata):
         # print(client)
         print()
-        # print(credit)
-        # print(client[0])
-        # print(credit)
-        # client_credit = (client_APIdata[0], credit_APIdata[0]) 
         client_credit = (client, credit) 
-        # # for client_dict in client_APIdata:
         client ={
             "upload_ts": ct.isoformat(),
             "id": client_credit[0]["distributors"][0]["number"],#str(id),#

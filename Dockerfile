@@ -9,5 +9,5 @@ RUN pip install --trusted-host pypi.python.org -r requirements.txt
 EXPOSE 80
 
 # CMD ["python", "main.py"]
-
-CMD [ "uvicorn", "main:app", "--reload", "--port", "80" ]
+# --reload
+CMD [ "uvicorn", "main:app", "-k", "uvicorn.workers.UvicornWorker", "--port", "80" ]
