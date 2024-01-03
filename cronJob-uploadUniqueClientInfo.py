@@ -42,7 +42,7 @@ def get_client_data(src_path):
     client_ids = read_csv_clients(src_path)
     print(client_ids)
     # Define the URL
-    url = "http://aceqa.grupodp.com.mx:7083/pos/s2credit-portal/distributor/get-distributors"
+    url = os.environ.get("DISTRIBUTORS_URL")
     # Define the headers
     headers = {
         "Content-Type": "application/json"
@@ -74,6 +74,8 @@ def get_client_data(src_path):
 def get_credit_data(src_path):
     client_ids = read_csv_clients(src_path)
     # Define the URL
+
+    url = os.environ.get("CREDIT_URL")
     url = "http://aceqa.grupodp.com.mx:7083/pos/s2credit-portal/distributor/get-credit"
 
     # Define the headers
@@ -96,11 +98,10 @@ def get_credit_data(src_path):
             response = f"Error getting data for {payload}" 
         responses.append(response)
 
-    return responses #responses.status_cod
+    return responses 
 
 
 def save_data_Cloudant(src_path, client_APIdata, credit_APIdata, prod):
-    # time.sleep(3)
     print()
     # ct stores current time
     ct = datetime.datetime.now()

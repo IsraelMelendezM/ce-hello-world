@@ -7,7 +7,7 @@ import json
 class GenerateAndSendOTP(Resource):
 
     def get(self):
-        logger.debug("GenerateAndSendOTP -> inside GET Method")
+        logger.debug("GenerateAndSendOTP -> inside POST Method")
         phoneNo = request.args['phoneNo']
         from helpers.TwilioAdapter import MessageClient
         from helpers.OTPGenerator import Generate

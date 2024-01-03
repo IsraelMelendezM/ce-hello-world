@@ -33,15 +33,15 @@ class AuthResponse(BaseModel):
 async def root():
     return {"message": "Hello World"}
 
-@app.post("/getClientDetails")
-async def clientData(data: ClientID):
+@app.post("/get_client_details_with_id")
+async def clientData(id: str):
     ## Obtener datos importantes con el ID de distribuidor
     try:
         service = GetClientDetails()
-        logger.debug(data.id)
+        logger.debug("DISTRIBUTOR ID",  id)
         doc = service.get_doc_by_key(dbName='test-distribuidores',
                           ddoc='clientes',
-                          key=str(data.id),
+                          key=id,
                             view='daily_record')
         logger.debug(doc)
         pay_by_date_dt = datetime.strptime(doc['should_pay_by'], '%Y-%m-%d')
@@ -51,6 +51,10 @@ async def clientData(data: ClientID):
         # print(doc)
         benefits_str = ', '.join([item['name'] for item in doc['benefits']['items'] ])
         
+
+        with open('clientData.json', 'w') as fs:
+            json.dump(doc, fs, indent=2)
+
         return {'record': doc,
             'benefits': benefits_str,
             'hubo_respuesta': 1,
@@ -59,7 +63,8 @@ async def clientData(data: ClientID):
             'should_pay_by_date_minus_4_sp': as_spanish(offset_days(cst,-3)),
         }
     except Exception as err:
-        return {"Error":f"could not return any function {err}"}
+        return {"Error":f"could not return any function {err}. 
+                Error trying to obtain client data. ID not found in Database"}, 400
 
 
 @app.post('/generate_and_send_otp/')
@@ -99,6 +104,7 @@ def generate_and_send_otp(phoneNo: str):
 
 @app.post("/auth", response_model=AuthResponse)
 async def auth(request_data: AuthRequest):
+    
     phoneNo = request_data.phoneNo
     otp = request_data.otp
 
