@@ -13,6 +13,7 @@ from helpers.OTPGenerator import Generate
 from helpers.Cloudant import GetClientDetails
 from helpers.Cloudant import sp_time, as_spanish, offset_days
 
+from flask import Flask, jsonify
 logger.basicConfig(level="DEBUG")
 
 app = FastAPI()
@@ -78,13 +79,13 @@ async def clientData(request_data: ClientID):
     with open('clientData.json', 'w') as fs:
         json.dump(doc, fs, indent=2)
 
-    return {'record': doc,
+    return json.dumps([{'record': doc,
         'benefits': benefits_str,
         'hubo_respuesta': 1,
         'first_name':doc['name'].split(' ')[0],
         'should_pay_by_date_sp': as_spanish(cst),
-        'should_pay_by_date_minus_4_sp': as_spanish(offset_days(cst,-3)),
-    }
+        'should_pay_by_date_minus_4_sp': as_spanish(offset_days(cst,-3))
+    }])
 
 
 @app.post('/generate_and_send_otp/')
