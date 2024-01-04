@@ -29,6 +29,16 @@ class AuthResponse(BaseModel):
     authentication: bool
     validation_msg: str 
 
+
+class OTPRequest(BaseModel):
+    phoneNo: str
+
+class EngineRequest(BaseModel):
+    case:str
+    id: Optional[str] = None
+    phoneNo: Optional[str] = None
+    otp: Optional[str]= None
+
 client = http3.AsyncClient()
 
 async def async_post(url: str):
@@ -78,38 +88,37 @@ async def clientData(request_data: ClientID):
 
 
 @app.post('/generate_and_send_otp/')
-def generate_and_send_otp(phoneNo: str):
-	logger.debug("GenerateAndSendOTP -> inside POST Method")
+def generate_and_send_otp(request_data: OTPRequest):
+    phoneNo = request_data.phoneNo
+    if not phoneNo:
+       return {"error": "phoneNo is required"}
 
-	if not phoneNo:
-		return {"error": "phoneNo is required"}
+    otpObject = Generate()
+    otp = otpObject.OTP()
 
-	otpObject = Generate()
-	otp = otpObject.OTP()
+    time = datetime.now()
+    logger.debug(type(time))
 
-	time = datetime.now()
-	logger.debug(type(time))
+    message = f"Tu código de verificación es *{otp}*. Por tu seguridad, no lo compartas."
+    number = str(phoneNo)
 
-	message = f"Tu código de verificación es *{otp}*. Por tu seguridad, no lo compartas."
-	number = str(phoneNo)
+    metadata = {
+        "phone_no": number,
+        "otp": str(otp),
+        "time": time.strftime("%H:%M")
+    }
 
-	metadata = {
-		"phone_no": number,
-		"otp": str(otp),
-		"time": time.strftime("%H:%M")
-	}
+    with open('otpValidity.json', 'w') as fs:
+        json.dump(metadata, fs, indent=2)
 
-	with open('otpValidity.json', 'w') as fs:
-		json.dump(metadata, fs, indent=2)
+    try:
+        twilioObject = MessageClient()
+        twilioObject.send_message(message, number)
+        logger.debug(message)
+    except Exception as e:
+        return {"error": str(e)}
 
-	try:
-		twilioObject = MessageClient()
-		twilioObject.send_message(message, number)
-		logger.debug(message)
-	except Exception as e:
-		return {"error": str(e)}
-
-	return metadata, 200
+    return metadata, 200
 
 
 @app.post("/auth", response_model=AuthResponse)
@@ -148,14 +157,15 @@ def auth(request_data: AuthRequest):
     }
 
 @app.post("/engine")
-async def auth(case:str, 
-               id: Optional[str] = None,
-               phoneNo: Optional[str] = None,
-               otp: Optional[str]= None):
+async def engine(request_data: EngineRequest):
     
     load_dotenv()
     host = os.environ.get("HOST")
     port = os.environ.get("PORT")
+    case = request_data.case
+    id = request_data.id
+    phoneNo = request_data.phoneNo
+    otp = request_data.otp
 
     if case == "get_client_details":
         # host = "169.62.228.229:8000"
