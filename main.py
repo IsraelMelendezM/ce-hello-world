@@ -3,16 +3,15 @@ import os
 import json
 from datetime import datetime
 from fastapi import FastAPI, HTTPException
-from pprint import pprint 
 from pydantic import BaseModel
 
 from typing import Optional
-import requests 
 from dotenv import load_dotenv
 from helpers.TwilioAdapter import MessageClient
 from helpers.OTPGenerator import Generate
 from helpers.Cloudant import GetClientDetails
 from helpers.Cloudant import sp_time, as_spanish, offset_days
+import http3
 
 logger.basicConfig(level="DEBUG")
 
@@ -30,18 +29,19 @@ class AuthResponse(BaseModel):
     authentication: bool
     validation_msg: str 
 
-# class EngineRequest(BaseModel):
-#     arg1: str
-#     arg2: str
-#     case: str
 
+client = http3.AsyncClient()
+
+async def async_post(url: str):
+    r = await client.post(url)
+    return r.json()
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
 @app.post("/get_client_details_with_id")
-def clientData(id: str):
+async def clientData(id: str):
     ## Obtener datos importantes con el ID de distribuidor
     try:
         service = GetClientDetails()
@@ -149,20 +149,20 @@ def auth(request_data: AuthRequest):
     }
 
 @app.post("/engine")
-async def auth(case:str, id: Optional[str] = None,
+async def auth(case:str, 
+               id: Optional[str] = None,
                phoneNo: Optional[str] = None,
                otp: Optional[str]= None):
     
     load_dotenv()
     host = os.environ.get("HOST")
+    port = os.environ.get("PORT")
 
-    if case == "get_client_details_with_id":
+    if case == "get_client_details":
         # host = "169.62.228.229:8000"
-        ext = ":8000"
-        url =  f"http://{host}{ext}/get_client_details_with_id/?={id}"
+        url =  f"http://{host}:{port}/get_client_details_with_id/?id={id}"
         try:
-            inp_post_response = requests.post(url , 
-                                              json={"id":id})
+            inp_post_response = await async_post(url)
             if inp_post_response .status_code == 200:
                 return inp_post_response, 200
             
@@ -170,11 +170,9 @@ async def auth(case:str, id: Optional[str] = None,
              return {"error": str(e)}
         
     elif case == "send_otp":    
-        ext = ":8000"
-        url =  f"http://{host}{ext}/generate_and_send_otp/?={phoneNo}"
+        url =  f"http://{host}:{port}/generate_and_send_otp/?={phoneNo}"
         try:
-            inp_post_response = requests.post(url , 
-                                              json={"phoneNo":phoneNo})
+            inp_post_response = await async_post(url)
             if inp_post_response .status_code == 200:
                 return inp_post_response, 200
             
@@ -182,13 +180,10 @@ async def auth(case:str, id: Optional[str] = None,
              return {"error": str(e)}
         
     elif case == "auth":
-        ext = ":8000"
-        url =  f"http://{host}{ext}/auth/?={phoneNo}&?={otp}"
+        url =  f"http://{host}:{port}/auth/?={phoneNo}&?={otp}"
         try:
-            inp_post_response = requests.post(url ,
-                                               json={"phoneNo":phoneNo,
-                                                     "otp": otp})
-            if inp_post_response .status_code == 200:
+            inp_post_response = await async_post(url)
+            if inp_post_response.status_code == 200:
                 return inp_post_response, 200
             
         except Exception as e:
