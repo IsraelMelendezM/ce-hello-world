@@ -2,7 +2,7 @@ import logging as logger
 import os
 import json
 from datetime import datetime
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pprint import pprint 
 from pydantic import BaseModel
 import requests 
@@ -26,7 +26,6 @@ class AuthRequest(BaseModel):
 class AuthResponse(BaseModel):
     phone_no: int
     authentication: bool
-    client_no: str
     validation_msg: str
 
 class EngineRequest(BaseModel):
@@ -43,33 +42,37 @@ async def clientData(id: str):
     ## Obtener datos importantes con el ID de distribuidor
     try:
         service = GetClientDetails()
-        logger.debug("DISTRIBUTOR ID",  id)
-        doc = service.get_doc_by_key(dbName='test-distribuidores',
-                          ddoc='clientes',
-                          key=id,
-                            view='daily_record')
-        logger.debug(doc)
-        pay_by_date_dt = datetime.strptime(doc['should_pay_by'], '%Y-%m-%d')
-
-        cst = sp_time(pay_by_date_dt, 0, 'cst')
-        
-        # print(doc)
-        benefits_str = ', '.join([item['name'] for item in doc['benefits']['items'] ])
-        
-
-        with open('clientData.json', 'w') as fs:
-            json.dump(doc, fs, indent=2)
-
-        return {'record': doc,
-            'benefits': benefits_str,
-            'hubo_respuesta': 1,
-            'first_name':doc['name'].split(' ')[0],
-            'should_pay_by_date_sp': as_spanish(cst),
-            'should_pay_by_date_minus_4_sp': as_spanish(offset_days(cst,-3)),
-        }
     except Exception as err:
-        return {"Error":f"could not return any function {err}. 
-                Error trying to obtain client data. ID not found in Database"}, 400
+        return(err)
+    logger.debug("DISTRIBUTOR ID",  id)
+
+    doc = service.get_doc_by_key(dbName='test-distribuidores',
+                            ddoc='clientes',
+                            key=id,
+                            view='daily_record')
+    if doc is None:
+         raise HTTPException(status_code=404, 
+                             detail="Distributor ID not found in Database")
+
+    logger.debug(doc)
+    pay_by_date_dt = datetime.strptime(doc['should_pay_by'], '%Y-%m-%d')
+
+    cst = sp_time(pay_by_date_dt, 0, 'cst')
+    
+    # print(doc)
+    benefits_str = ', '.join([item['name'] for item in doc['benefits']['items'] ])
+    
+
+    with open('clientData.json', 'w') as fs:
+        json.dump(doc, fs, indent=2)
+
+    return {'record': doc,
+        'benefits': benefits_str,
+        'hubo_respuesta': 1,
+        'first_name':doc['name'].split(' ')[0],
+        'should_pay_by_date_sp': as_spanish(cst),
+        'should_pay_by_date_minus_4_sp': as_spanish(offset_days(cst,-3)),
+    }
 
 
 @app.post('/generate_and_send_otp/')
@@ -121,7 +124,8 @@ async def auth(request_data: AuthRequest):
     nowTime = datetime.now()
 
     delta = nowTime - otpGeneratedTime
-    timeDiff = int(delta.seconds / 60)
+    timeDiff = int(delta.seconds / 60) # in minutes
+    logger.debug(timeDiff)
 
     authenticated = False
     validationMsg = ""
@@ -134,7 +138,7 @@ async def auth(request_data: AuthRequest):
     else:
         authenticated = True
         validationMsg = "OTP Validated"
-
+    
     return {
         "phone_no": phoneNo,
         "authentication": authenticated,

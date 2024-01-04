@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibmcloudant.cloudant_v1 import CloudantV1
 import os
-import load_dotenv
+from dotenv import load_dotenv
 
 def offset_days(dt:datetime = None, days:int =0):
     return dt + timedelta(days=days)
@@ -66,8 +66,8 @@ class GetClientDetails:
 
         load_dotenv()
 
-        credentials = {'CLOUDANT_API_KEY':os.environ("CLOUDANT_API_KEY"),
-                        'CLOUDANT_URL':os.environ("CLOUDANT_URL")}
+        credentials = {'CLOUDANT_API_KEY':os.environ.get("CLOUDANT_API_KEY"),
+                        'CLOUDANT_URL':os.environ.get("CLOUDANT_URL")}
         
         authenticator = IAMAuthenticator(credentials['CLOUDANT_API_KEY'])
         self.client = CloudantV1(authenticator=authenticator)
