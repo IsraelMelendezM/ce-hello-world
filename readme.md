@@ -7,8 +7,11 @@ cd twilio_otp_api
 Create a virtual environment:
 
 ```bash
-python3.10 -m venv .dportenis
+python3.10 -m venv .venv
 ```
+Activate the virtual environment:
+```bash
+source .venv/bin/activate```
 
 ```bash
 pip3.10 install -r requirements.txt

@@ -4,14 +4,14 @@ import json
 from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-
+import http3
 from typing import Optional
 from dotenv import load_dotenv
+
 from helpers.TwilioAdapter import MessageClient
 from helpers.OTPGenerator import Generate
 from helpers.Cloudant import GetClientDetails
 from helpers.Cloudant import sp_time, as_spanish, offset_days
-import http3
 
 logger.basicConfig(level="DEBUG")
 
@@ -28,7 +28,6 @@ class AuthResponse(BaseModel):
     phone_no: int
     authentication: bool
     validation_msg: str 
-
 
 client = http3.AsyncClient()
 
@@ -163,28 +162,25 @@ async def auth(case:str,
         url =  f"http://{host}:{port}/get_client_details_with_id/?id={id}"
         try:
             inp_post_response = await async_post(url)
-            if inp_post_response .status_code == 200:
-                return inp_post_response, 200
+            return inp_post_response, 200
             
         except Exception as e:
              return {"error": str(e)}
         
     elif case == "send_otp":    
-        url =  f"http://{host}:{port}/generate_and_send_otp/?={phoneNo}"
+        url =  f"http://{host}:{port}/generate_and_send_otp/?phoneNo={phoneNo}"
         try:
             inp_post_response = await async_post(url)
-            if inp_post_response .status_code == 200:
-                return inp_post_response, 200
-            
+            return inp_post_response, 200
+        
         except Exception as e:
              return {"error": str(e)}
         
     elif case == "auth":
-        url =  f"http://{host}:{port}/auth/?={phoneNo}&?={otp}"
+        url =  f"http://{host}:{port}/auth/?phoneNo={phoneNo}&?otp={otp}"
         try:
             inp_post_response = await async_post(url)
-            if inp_post_response.status_code == 200:
-                return inp_post_response, 200
+            return inp_post_response, 200
             
         except Exception as e:
              return {"error": str(e)}
