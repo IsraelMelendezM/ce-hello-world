@@ -40,14 +40,14 @@ async def root():
     return {"message": "Hello World"}
 
 @app.post("/get_client_details_with_id")
-async def clientData(id: str):
+async def clientData(request_data: ClientID):
     ## Obtener datos importantes con el ID de distribuidor
     try:
         service = GetClientDetails()
     except Exception as err:
         return(err)
-    logger.debug("DISTRIBUTOR ID",  id)
-
+    logger.debug("DISTRIBUTOR ID",  request_data.id)
+    id = request_data.id
     doc = service.get_doc_by_key(dbName='test-distribuidores',
                             ddoc='clientes',
                             key=id,
