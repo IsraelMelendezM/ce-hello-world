@@ -3,10 +3,15 @@ To get the API running:
 
 ```bash
 cd twilio_otp_api
-e```
+```
+Create a virtual environment:
 
 ```bash
-pip install -r requirements.txt
+python3.10 -m venv .dportenis
+```
+
+```bash
+pip3.10 install -r requirements.txt
 ```
 
 ### For development:
