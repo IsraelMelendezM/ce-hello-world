@@ -5,7 +5,8 @@ from datetime import datetime
 from fastapi import FastAPI
 from pprint import pprint 
 from pydantic import BaseModel
-
+import requests 
+from dotenv import load_dotenv
 from helpers.TwilioAdapter import MessageClient
 from helpers.OTPGenerator import Generate
 from helpers.Cloudant import GetClientDetails
@@ -28,6 +29,10 @@ class AuthResponse(BaseModel):
     client_no: str
     validation_msg: str
 
+class EngineRequest(BaseModel):
+    id: str
+    case: str
+     
 
 @app.get("/")
 async def root():
@@ -136,6 +141,27 @@ async def auth(request_data: AuthRequest):
         "validation_msg": validationMsg
     }
 
+@app.post("/engine", response_model=EngineRequest)
+async def auth(request_data: EngineRequest):
+    id = request_data.id
+    case = request_data.case
+    
+    load_dotenv()
+    host = os.environ.get("HOST")
+
+    if case == "distributor":
+
+        # host = "169.62.228.229:8000"
+        ext = ":8000"
+        url =  f"http://{host}{ext}/get_client_details_with_id/{id}"
+        try:
+            inp_post_response = requests.post(url , json=request_data)
+            if inp_post_response .status_code == 200:
+                return inp_post_response, 200
+            
+        except Exception as e:
+             return {"error": str(e)}
+    
 port = os.getenv('VCAP_APP_PORT', '8080')
 if __name__ == "__main__":
     logger.debug("Starting the Application")
