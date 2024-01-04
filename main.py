@@ -5,6 +5,8 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from pprint import pprint 
 from pydantic import BaseModel
+
+from typing import Optional
 import requests 
 from dotenv import load_dotenv
 from helpers.TwilioAdapter import MessageClient
@@ -26,19 +28,20 @@ class AuthRequest(BaseModel):
 class AuthResponse(BaseModel):
     phone_no: int
     authentication: bool
-    validation_msg: str
+    validation_msg: str 
 
-class EngineRequest(BaseModel):
-    id: str
-    case: str
-     
+# class EngineRequest(BaseModel):
+#     arg1: str
+#     arg2: str
+#     case: str
+
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
 @app.post("/get_client_details_with_id")
-async def clientData(id: str):
+def clientData(id: str):
     ## Obtener datos importantes con el ID de distribuidor
     try:
         service = GetClientDetails()
@@ -111,7 +114,7 @@ def generate_and_send_otp(phoneNo: str):
 
 
 @app.post("/auth", response_model=AuthResponse)
-async def auth(request_data: AuthRequest):
+def auth(request_data: AuthRequest):
     
     phoneNo = request_data.phoneNo
     otp = request_data.otp
@@ -145,27 +148,56 @@ async def auth(request_data: AuthRequest):
         "validation_msg": validationMsg
     }
 
-@app.post("/engine", response_model=EngineRequest)
-async def auth(request_data: EngineRequest):
-    id = request_data.id
-    case = request_data.case
+@app.post("/engine")
+async def auth(case:str, id: Optional[str] = None,
+               phoneNo: Optional[str] = None,
+               otp: Optional[str]= None):
     
     load_dotenv()
     host = os.environ.get("HOST")
 
-    if case == "distributor":
-
+    if case == "get_client_details_with_id":
         # host = "169.62.228.229:8000"
         ext = ":8000"
-        url =  f"http://{host}{ext}/get_client_details_with_id/{id}"
+        url =  f"http://{host}{ext}/get_client_details_with_id/?={id}"
         try:
-            inp_post_response = requests.post(url , json=request_data)
+            inp_post_response = requests.post(url , 
+                                              json={"id":id})
             if inp_post_response .status_code == 200:
                 return inp_post_response, 200
             
         except Exception as e:
              return {"error": str(e)}
+        
+    elif case == "send_otp":    
+        ext = ":8000"
+        url =  f"http://{host}{ext}/generate_and_send_otp/?={phoneNo}"
+        try:
+            inp_post_response = requests.post(url , 
+                                              json={"phoneNo":phoneNo})
+            if inp_post_response .status_code == 200:
+                return inp_post_response, 200
+            
+        except Exception as e:
+             return {"error": str(e)}
+        
+    elif case == "auth":
+        ext = ":8000"
+        url =  f"http://{host}{ext}/auth/?={phoneNo}&?={otp}"
+        try:
+            inp_post_response = requests.post(url ,
+                                               json={"phoneNo":phoneNo,
+                                                     "otp": otp})
+            if inp_post_response .status_code == 200:
+                return inp_post_response, 200
+            
+        except Exception as e:
+             return {"error": str(e)}
+                 
+    else:
+         return {"error": "No cases ran."}
     
+
 port = os.getenv('VCAP_APP_PORT', '8080')
 if __name__ == "__main__":
     logger.debug("Starting the Application")
