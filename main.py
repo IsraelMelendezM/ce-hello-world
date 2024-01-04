@@ -79,13 +79,13 @@ async def clientData(request_data: ClientID):
     with open('clientData.json', 'w') as fs:
         json.dump(doc, fs, indent=2)
 
-    return json.dumps([{'record': doc,
+    return {'record': doc,
         'benefits': benefits_str,
         'hubo_respuesta': 1,
         'first_name':doc['name'].split(' ')[0],
         'should_pay_by_date_sp': as_spanish(cst),
         'should_pay_by_date_minus_4_sp': as_spanish(offset_days(cst,-3))
-    }])
+    }
 
 
 @app.post('/generate_and_send_otp/')
