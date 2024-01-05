@@ -13,7 +13,6 @@ from helpers.OTPGenerator import Generate
 from helpers.Cloudant import GetClientDetails
 from helpers.Cloudant import sp_time, as_spanish, offset_days
 
-from flask import Flask, jsonify
 logger.basicConfig(level="DEBUG")
 
 app = FastAPI()
@@ -36,10 +35,10 @@ class OTPRequest(BaseModel):
 
 class EngineRequest(BaseModel):
     case:str
-    id: Optional[str] = None
-    phoneNo: Optional[str] = None
-    otp: Optional[str]= None
-
+    id: str = None
+    phoneNo: str = None
+    otp: str= None
+    
 client = http3.AsyncClient()
 
 async def async_post(url: str):
