@@ -172,7 +172,7 @@ async def engine(request_data: EngineRequest):
         url =  f"http://{host}:{port}/get_client_details_with_id/?id={id}"
         try:
             inp_post_response = await async_post(url)
-            return inp_post_response, 200
+            return inp_post_response
             
         except Exception as e:
              return {"error": str(e)}
@@ -181,7 +181,7 @@ async def engine(request_data: EngineRequest):
         url =  f"http://{host}:{port}/generate_and_send_otp/?phoneNo={phoneNo}"
         try:
             inp_post_response = await async_post(url)
-            return inp_post_response, 200
+            return inp_post_response
         
         except Exception as e:
              return {"error": str(e)}
@@ -190,7 +190,7 @@ async def engine(request_data: EngineRequest):
         url =  f"http://{host}:{port}/auth/?phoneNo={phoneNo}&?otp={otp}"
         try:
             inp_post_response = await async_post(url)
-            return inp_post_response, 200
+            return inp_post_response
             
         except Exception as e:
              return {"error": str(e)}
