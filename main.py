@@ -35,9 +35,9 @@ class OTPRequest(BaseModel):
 
 class EngineRequest(BaseModel):
     case:str
-    id: str = None
-    phoneNo: str = None
-    otp: str= None
+    id: str = ""
+    phoneNo: str = ""
+    otp: str= ""
     
 client = http3.AsyncClient()
 
