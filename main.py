@@ -178,7 +178,7 @@ async def engine(request_data: EngineRequest):
         data = {'id':id}
         # try:
         inp_post_response = await async_post(url, data)
-        return json.dumps(inp_post_response)
+        return [inp_post_response]
             
         # except Exception as e:
         #      return {"error": str(e)}
