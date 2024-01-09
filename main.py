@@ -5,7 +5,6 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import http3
-from typing import Optional
 from dotenv import load_dotenv
 
 from helpers.TwilioAdapter import MessageClient
@@ -19,6 +18,10 @@ app = FastAPI()
 
 class ClientID(BaseModel):
     id: str
+
+class ClientID_a(BaseModel):
+    url: str
+    data: str
 
 class AuthRequest(BaseModel):
     phoneNo: int
@@ -37,12 +40,14 @@ class EngineRequest(BaseModel):
     case:str
     id: str = "0070055874"
     phoneNo: str = "8110423455"
-    otp: str= "1234"
-    
+    otp: int = 1234
+
 client = http3.AsyncClient()
 
-async def async_post(url: str):
-    r = await client.post(url)
+async def async_post(url, data):
+
+    r = await client.post(url,json=data )
+    # print(r)
     return r.json()
 
 @app.get("/")
@@ -170,26 +175,31 @@ async def engine(request_data: EngineRequest):
     if case == "get_client_details":
         # host = "169.62.228.229:8000"
         url =  f"http://{host}:{port}/get_client_details_with_id/?id={id}"
-        try:
-            inp_post_response = await async_post(url)
-            return inp_post_response
+        data = {'id':id}
+        # try:
+        inp_post_response = await async_post(url, data)
+        return inp_post_response
             
-        except Exception as e:
-             return {"error": str(e)}
+        # except Exception as e:
+        #      return {"error": str(e)}
         
     elif case == "send_otp":    
         url =  f"http://{host}:{port}/generate_and_send_otp/?phoneNo={phoneNo}"
+        data = {"url":url,"phoneNo": phoneNo}
         try:
-            inp_post_response = await async_post(url)
+            inp_post_response = await async_post(url, data)
             return inp_post_response
         
         except Exception as e:
              return {"error": str(e)}
         
     elif case == "auth":
-        url =  f"http://{host}:{port}/auth/?phoneNo={phoneNo}&?otp={otp}"
+        url =  f"http://{host}:{port}/auth/"
+        # phoneNo={phoneNo}&?otp={otp}"
+        data = {"phoneNo": str(phoneNo), "otp": int(otp)}
+
         try:
-            inp_post_response = await async_post(url)
+            inp_post_response = await async_post(url, data)
             return inp_post_response
             
         except Exception as e:
