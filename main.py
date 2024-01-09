@@ -176,12 +176,12 @@ async def engine(request_data: EngineRequest):
         # host = "169.62.228.229:8000"
         url =  f"http://{host}:{port}/get_client_details_with_id/"
         data = {'id':id}
-        # try:
-        inp_post_response = await async_post(url, data)
-        return inp_post_response
+        try:
+            inp_post_response = await async_post(url, data)
+            return inp_post_response
             
-        # except Exception as e:
-        #      return {"error": str(e)}
+        except Exception as e:
+             return {"error": str(e)}
         
     elif case == "send_otp":    
         url =  f"http://{host}:{port}/generate_and_send_otp/"
