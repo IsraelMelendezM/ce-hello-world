@@ -174,7 +174,7 @@ async def engine(request_data: EngineRequest):
 
     if case == "get_client_details":
         # host = "169.62.228.229:8000"
-        url =  f"http://{host}:{port}/get_client_details_with_id/?id={id}"
+        url =  f"http://{host}:{port}/get_client_details_with_id/"
         data = {'id':id}
         # try:
         inp_post_response = await async_post(url, data)
@@ -184,8 +184,8 @@ async def engine(request_data: EngineRequest):
         #      return {"error": str(e)}
         
     elif case == "send_otp":    
-        url =  f"http://{host}:{port}/generate_and_send_otp/?phoneNo={phoneNo}"
-        data = {"url":url,"phoneNo": phoneNo}
+        url =  f"http://{host}:{port}/generate_and_send_otp/"
+        data = {"phoneNo": phoneNo}
         try:
             inp_post_response = await async_post(url, data)
             return inp_post_response
