@@ -4,7 +4,6 @@ import json
 from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import http3
 from dotenv import load_dotenv
 
 from helpers.TwilioAdapter import MessageClient
@@ -16,25 +15,6 @@ logger.basicConfig(level="DEBUG")
 
 app = FastAPI()
 
-class ClientID(BaseModel):
-    id: str
-
-class ClientID_a(BaseModel):
-    url: str
-    data: str
-
-class AuthRequest(BaseModel):
-    phoneNo: int
-    otp: int
-
-class AuthResponse(BaseModel):
-    phone_no: int
-    authentication: bool
-    validation_msg: str 
-
-
-class OTPRequest(BaseModel):
-    phoneNo: str
 
 class EngineRequest(BaseModel):
     case:str
@@ -42,27 +22,19 @@ class EngineRequest(BaseModel):
     phoneNo: str = "8110423455"
     otp: int = 1234
 
-client = http3.AsyncClient()
-
-async def async_post(url, data):
-
-    r = await client.post(url,json=data )
-    # print(r)
-    return r.json()
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
-@app.post("/get_client_details_with_id")
-async def clientData(request_data: ClientID):
+def clientData(data):
     ## Obtener datos importantes con el ID de distribuidor
     try:
         service = GetClientDetails()
     except Exception as err:
         return(err)
-    logger.debug("DISTRIBUTOR ID",  request_data.id)
-    id = request_data.id
+    logger.debug("DISTRIBUTOR ID",  data)
+    id = data["id"]
     doc = service.get_doc_by_key(dbName='test-distribuidores',
                             ddoc='clientes',
                             key=id,
@@ -92,9 +64,8 @@ async def clientData(request_data: ClientID):
     }
 
 
-@app.post('/generate_and_send_otp/')
-def generate_and_send_otp(request_data: OTPRequest):
-    phoneNo = request_data.phoneNo
+def generate_and_send_otp(data):
+    phoneNo = data["phoneNo"]
     if not phoneNo:
        return {"error": "phoneNo is required"}
 
@@ -126,11 +97,10 @@ def generate_and_send_otp(request_data: OTPRequest):
     return metadata, 200
 
 
-@app.post("/auth", response_model=AuthResponse)
-def auth(request_data: AuthRequest):
+def auth(data):
     
-    phoneNo = request_data.phoneNo
-    otp = request_data.otp
+    phoneNo = data["phoneNo"]
+    otp = data["otp"]
 
     with open('otpValidity.json', 'r') as fs:
         otpFile = json.loads(fs.read())
@@ -173,33 +143,28 @@ async def engine(request_data: EngineRequest):
     otp = request_data.otp
 
     if case == "get_client_details":
-        # host = "169.62.228.229:8000"
-        url =  f"http://{host}:{port}/get_client_details_with_id/"
         data = {'id':id}
         try:
-            inp_post_response = await async_post(url, data)
+            inp_post_response =  clientData( data)
             return inp_post_response
             
         except Exception as e:
              return {"error": str(e)}
         
     elif case == "send_otp":    
-        url =  f"http://{host}:{port}/generate_and_send_otp/"
         data = {"phoneNo": phoneNo}
         try:
-            inp_post_response = await async_post(url, data)
+            inp_post_response =  generate_and_send_otp(data)
             return inp_post_response
         
         except Exception as e:
              return {"error": str(e)}
         
     elif case == "auth":
-        url =  f"http://{host}:{port}/auth/"
-        # phoneNo={phoneNo}&?otp={otp}"
         data = {"phoneNo": str(phoneNo), "otp": int(otp)}
 
         try:
-            inp_post_response = await async_post(url, data)
+            inp_post_response =  auth(data)
             return inp_post_response
             
         except Exception as e:
