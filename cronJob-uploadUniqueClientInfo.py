@@ -117,7 +117,7 @@ def save_data_Cloudant(src_path, client_APIdata, credit_APIdata, prod):
         document.Type = "Cliente"
         document.Record = {
             "upload_ts": ct.isoformat(),
-            "auth": "0",
+            "auth": False,
             "id": client_credit[0]["distributors"][0]["number"],#str(id),#
 	        "name": client_credit[0]["distributors"][0]["distributor"],
             "location": client_credit[0]["distributors"][0]["branch"],
