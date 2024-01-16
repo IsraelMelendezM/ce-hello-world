@@ -94,7 +94,7 @@ def generate_and_send_otp(data):
     except Exception as e:
         return {"error": str(e)}
 
-    return metadata, 200
+    return metadata
 
 
 def auth(data):
@@ -115,7 +115,7 @@ def auth(data):
 
     authenticated = False
     validationMsg = ""
-
+    
 
     if int(otpFile.get('otp')) != otp:
         validationMsg = "Invalid OTP"
@@ -124,7 +124,7 @@ def auth(data):
     else:
         authenticated = True
         validationMsg = "OTP Validated"
-    
+    # TODO: mandar que se validó a Cloudant BD
     return {
         "phone_no": phoneNo,
         "authentication": authenticated,
