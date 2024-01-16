@@ -119,7 +119,17 @@ def auth(data):
     else:
         authenticated = True
         validationMsg = "OTP Validated"
-    # TODO: mandar que se validó a Cloudant BD
+
+        # Se manda auth a Cloudant BD
+        client = GetClientDetails()
+        doc = client.get_doc_by_key(dbName='test-distribuidores',
+                            ddoc='clientes',
+                            key=data["id"],
+                            view='daily_record')
+        doc["auth"] = True
+
+        client.update_document(db='test-distribuidores',
+                                        document=doc)   
     return {
         "phone_no": phoneNo,
         "authentication": authenticated,
@@ -130,8 +140,8 @@ def auth(data):
 async def engine(request_data: EngineRequest):
     
     load_dotenv()
-    host = os.environ.get("HOST")
-    port = os.environ.get("PORT")
+    # host = os.environ.get("HOST")
+    # port = os.environ.get("PORT")
     case = request_data.case
     id = request_data.id
     phoneNo = request_data.phoneNo

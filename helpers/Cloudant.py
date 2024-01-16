@@ -98,3 +98,13 @@ class GetClientDetails:
             raise Exception('get_doc_by_key: Problem getting document by id from view')
             
         return _result
+    def update_document(self, document, db='test-distribuidores'):
+        try:
+            _response = self.client.post_document( 
+                                                  db="test-distribuidores",
+                                                  document=document).get_result()
+            # print(_response)
+            return _response
+        except Exception as err:
+            print(f'ApiException getting value {err}')
+            raise Exception('get_doc_by_key: Problem updating document by id from view')
