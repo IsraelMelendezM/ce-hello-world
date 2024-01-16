@@ -1,10 +1,8 @@
 import os 
-import requests, io, json
 from twilio.rest import Client
 from ibmcloudant.cloudant_v1 import CloudantV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
-
-from datetime import  datetime
+from datetime import datetime, timedelta
 import pandas as pd
 
 from dotenv import load_dotenv
@@ -77,9 +75,13 @@ def main():
     for doc in clientData:
 
         try: 
-            print(doc)
-            print()
-            # twilio_reminder(doc)
+            # print(doc)
+            due_date = datetime.strptime(doc["should_pay_by"], "%Y-%m-%d")- timedelta(days=2)
+            todays_date = datetime.now()
+            
+            if (due_date-todays_date).days == 0:
+                ...
+                # twilio_reminder(doc)
         except Exception as err:
             print(err, "error sending message through Twilio")
 main()

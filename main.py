@@ -119,17 +119,17 @@ def auth(data):
     else:
         authenticated = True
         validationMsg = "OTP Validated"
+        if data["id"]:
+            # Se manda auth a Cloudant BD
+            client = GetClientDetails()
+            doc = client.get_doc_by_key(dbName='test-distribuidores',
+                                ddoc='clientes',
+                                key=data["id"],
+                                view='daily_record')
+            doc["auth"] = True
 
-        # Se manda auth a Cloudant BD
-        client = GetClientDetails()
-        doc = client.get_doc_by_key(dbName='test-distribuidores',
-                            ddoc='clientes',
-                            key=data["id"],
-                            view='daily_record')
-        doc["auth"] = True
-
-        client.update_document(db='test-distribuidores',
-                                        document=doc)   
+            client.update_document(db='test-distribuidores',
+                                            document=doc)   
     return {
         "phone_no": phoneNo,
         "authentication": authenticated,
