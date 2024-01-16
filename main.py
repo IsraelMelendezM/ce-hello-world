@@ -33,17 +33,16 @@ def clientData(data):
         service = GetClientDetails()
     except Exception as err:
         return(err)
-    logger.debug("DISTRIBUTOR ID",  data)
-    id = data["id"]
+    # logger.debug("DISTRIBUTOR ID",  data)
     doc = service.get_doc_by_key(dbName='test-distribuidores',
                             ddoc='clientes',
-                            key=id,
+                            key=data["id"],
                             view='daily_record')
     if doc is None:
          raise HTTPException(status_code=404, 
                              detail="Distributor ID not found in Database")
 
-    logger.debug(doc)
+    # logger.debug(doc)
     pay_by_date_dt = datetime.strptime(doc['should_pay_by'], '%Y-%m-%d')
 
     cst = sp_time(pay_by_date_dt, 0, 'cst')
@@ -51,10 +50,6 @@ def clientData(data):
     # print(doc)
     benefits_str = ', '.join([item['name'] for item in doc['benefits']['items'] ])
     
-
-    with open('clientData.json', 'w') as fs:
-        json.dump(doc, fs, indent=2)
-
     return {'record': doc,
         'benefits': benefits_str,
         'hubo_respuesta': 1,
