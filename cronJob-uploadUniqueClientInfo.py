@@ -11,12 +11,12 @@ import argparse
 from ibmcloudant.cloudant_v1 import CloudantV1, Document, BulkDocs
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
-import load_dotenv
+from dotenv import  load_dotenv
 
 load_dotenv()
 
-credentials = {'CLOUDANT_API_KEY':os.environ("CLOUDANT_API_KEY"),
-                'CLOUDANT_URL':os.environ("CLOUDANT_URL")}
+credentials = {'CLOUDANT_API_KEY':os.environ.get("CLOUDANT_API_KEY"),
+                'CLOUDANT_URL':os.environ.get("CLOUDANT_URL")}
         
 ct = datetime.datetime.now()
 print("current time:-", ct)
@@ -112,7 +112,7 @@ def save_data_Cloudant(src_path, client_APIdata, credit_APIdata, prod):
         print()
         client_credit = (client, credit) 
 
-        # print(client["id"])
+        print(client_credit)
         document: Document = Document()
         document.Type = "Cliente"
         document.Record = {
@@ -237,6 +237,7 @@ if __name__ == "__main__":
         print("Running in non-production mode")
         ## get DEMO client numbers
         src_path = r"/home/sftp_dportenis/test.csv"
+        # src_path = r"test.csv"
         ## get API DATA
         client_data = get_client_data(src_path)
         credit_data = get_credit_data(src_path)
