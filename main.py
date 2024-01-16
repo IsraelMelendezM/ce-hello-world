@@ -68,7 +68,7 @@ def generate_and_send_otp(data):
     otp = otpObject.OTP()
 
     time = datetime.now()
-    logger.debug(type(time))
+    # logger.debug(type(time))
 
     message = f"Tu código de verificación es *{otp}*. Por tu seguridad, no lo compartas."
     number = str(phoneNo)

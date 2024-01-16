@@ -113,27 +113,28 @@ def save_data_Cloudant(src_path, client_APIdata, credit_APIdata, prod):
         # print(client)
         print()
         client_credit = (client, credit) 
-        client ={
-            "upload_ts": ct.isoformat(),
-            "id": client_credit[0]["distributors"][0]["number"],#str(id),#
-	        "name": client_credit[0]["distributors"][0]["distributor"],
-            "location": client_credit[0]["distributors"][0]["branch"],
-            "phone_number": client_credit[0]["distributors"][0]["phones"][0]["number"],
-            "credit_footwear": client_credit[1]["available_footwear"],
-            "credit_financial": client_credit[1]["available_financial"],
-            "credit_personal": client_credit[1]["available_credit_line"],
-            "benefits": client_credit[1]["insurance_benefits"],
-            "toPay": client_credit[1]["released"],
-            "discount": client_credit[1]["discount"],
-            "toPayAfterDiscount": client_credit[1]["toPay"],
-            "cutoff_date": client_credit[1]["cutoff_date"],
-            "should_pay_by": client_credit[1]["payment_date"]
-                }
-        print(client["id"])
+        # client ={
+        #     "upload_ts": ct.isoformat(),
+        #     "id": client_credit[0]["distributors"][0]["number"],#str(id),#
+	    #     "name": client_credit[0]["distributors"][0]["distributor"],
+        #     "location": client_credit[0]["distributors"][0]["branch"],
+        #     "phone_number": client_credit[0]["distributors"][0]["phones"][0]["number"],
+        #     "credit_footwear": client_credit[1]["available_footwear"],
+        #     "credit_financial": client_credit[1]["available_financial"],
+        #     "credit_personal": client_credit[1]["available_credit_line"],
+        #     "benefits": client_credit[1]["insurance_benefits"],
+        #     "toPay": client_credit[1]["released"],
+        #     "discount": client_credit[1]["discount"],
+        #     "toPayAfterDiscount": client_credit[1]["toPay"],
+        #     "cutoff_date": client_credit[1]["cutoff_date"],
+        #     "should_pay_by": client_credit[1]["payment_date"]
+        #         }
+        # print(client["id"])
         document: Document = Document()
         document.Type = "Cliente"
         document.Record = {
             "upload_ts": ct.isoformat(),
+            "auth": False,
             "id": client_credit[0]["distributors"][0]["number"],#str(id),#
 	        "name": client_credit[0]["distributors"][0]["distributor"],
             "location": client_credit[0]["distributors"][0]["branch"],
