@@ -7,7 +7,7 @@ cd twilio_otp_api
 Create a virtual environment with pip or conda:
 ### With pip
 ```bash
-python3.10 -m venv .venv
+python -m venv .venv
 ```
 Activate the virtual environment:
 ```bash
@@ -18,10 +18,12 @@ source .venv/bin/activate
 ```bash
 conda create -n venv python=3.9
 ```
-
+```bash
+conda activate venv 
+```
 
 ```bash
-pip3.10 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ### For development:
