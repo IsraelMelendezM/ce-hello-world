@@ -37,3 +37,7 @@ gunicorn --worker-class uvicorn.workers.UvicornWorker  --bind 0.0.0.0:8080 main:
 The API is made for integration for the Watson Assistant.
 
 CronJob scripts are made to run in the morning.
+
+### For local usage:
+
+Go to localhost:8000/docs#/ to see methods and use cases.
