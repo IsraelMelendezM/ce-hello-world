@@ -3,3 +3,5 @@ __pycache__/*
 .env
 helpers/__pycache__/*
 apis/__pycache__/*
+.vscode
+*.json

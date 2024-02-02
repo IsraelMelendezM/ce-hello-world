@@ -11,6 +11,10 @@ import argparse
 from ibmcloudant.cloudant_v1 import CloudantV1, Document, BulkDocs
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger()
+
 from dotenv import  load_dotenv
 
 load_dotenv()
@@ -24,7 +28,7 @@ authenticator = IAMAuthenticator(apikey=credentials['CLOUDANT_API_KEY'])
 
 # Create an instance of the Cloudant service with the authenticator
 service = CloudantV1(authenticator=authenticator)
-service.set_service_url(credentials['CLOUDANT_API_KEY'])
+service.set_service_url(credentials['CLOUDANT_URL'])
 
 # Define a function to send a POST request with JSON data
 def send_post_request(url, data, headers):
@@ -67,7 +71,7 @@ def get_client_data(src_path):
         except:
             response =  f"Error getting data for {payload}" 
         responses.append(response)
-
+    logging.debug("responses", responses)
     return responses #responses.status_code
 
 def get_credit_data(src_path):
@@ -99,7 +103,7 @@ def get_credit_data(src_path):
     return responses 
 
 
-def save_data_Cloudant(src_path, client_APIdata, credit_APIdata, prod):
+def save_data_Cloudant(src_path:str, client_APIdata: list, credit_APIdata:list, prod:bool):
     print()
     # ct stores current time
     ct = datetime.datetime.now()
@@ -118,6 +122,7 @@ def save_data_Cloudant(src_path, client_APIdata, credit_APIdata, prod):
         document.Record = {
             "upload_ts": ct.isoformat(),
             "auth": False,
+            "satisfaction": 0,
             "id": client_credit[0]["distributors"][0]["number"],#str(id),#
 	        "name": client_credit[0]["distributors"][0]["distributor"],
             "location": client_credit[0]["distributors"][0]["branch"],
@@ -167,7 +172,7 @@ def delete_all_documents(prod):
                 doc_id=doc_id,
                 rev=rev
             ).get_result()
-            time.sleep(0.2)
+            time.sleep(0.1)
             print(f"Deleted document {doc_id} - {response}")
 
 def get_unique_clients_latest_data(prod):
@@ -225,8 +230,9 @@ if __name__ == "__main__":
         ## get API DATA
         client_data = get_client_data(src_path)
         credit_data = get_credit_data(src_path)
+
         # save historico data
-        save_data_Cloudant(src_path, client_data, credit_data, args.prod)
+        save_data_Cloudant(src_path, client_data, credit_data, args.prod, service)
         ### delete current distribuidores db 
         delete_all_documents(args.prod)
         ### get most recent data from historic db
@@ -236,19 +242,19 @@ if __name__ == "__main__":
     elif args.nonprod:
         print("Running in non-production mode")
         ## get DEMO client numbers
-        src_path = r"/home/sftp_dportenis/test.csv"
-        # src_path = r"test.csv"
+        # src_path = r"/home/sftp_dportenis/test.csv"
+        src_path = r"test.csv"
         ## get API DATA
         client_data = get_client_data(src_path)
         credit_data = get_credit_data(src_path)
         # save historico data
-        save_data_Cloudant(src_path, client_data, credit_data, args.prod)
+        save_data_Cloudant(src_path, client_data, credit_data, args.nonprod)
 
         ### delete current distribuidores db 
-        delete_all_documents(args.prod)
-        ### get most recent data from historic db
-        ## and save unique to distribuidores db
-        get_unique_clients_latest_data(args.prod)
+        delete_all_documents(args.nonprod)
+        # ### get most recent data from historic db
+        # ## and save unique to distribuidores db
+        get_unique_clients_latest_data(args.nonprod)
 
     else:
         print("No mode specified. Use either --prod or --nonprod.")
