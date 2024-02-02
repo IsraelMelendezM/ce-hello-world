@@ -71,7 +71,7 @@ def get_client_data(src_path):
         except:
             response =  f"Error getting data for {payload}" 
         responses.append(response)
-    logging.debug("responses", responses)
+    # logging.debug("responses", responses)
     return responses #responses.status_code
 
 def get_credit_data(src_path):
@@ -109,7 +109,7 @@ def save_data_Cloudant(src_path:str, client_APIdata: list, credit_APIdata:list, 
     ct = datetime.datetime.now()
     print("current time:-", ct)
 
-
+    print(client_APIdata, credit_APIdata)
     records = []
     for client, credit in zip(client_APIdata, credit_APIdata):
         # print(client)
