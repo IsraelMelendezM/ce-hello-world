@@ -206,6 +206,7 @@ def get_unique_clients_latest_data(prod):
 
     print(unique_ids_docs)
     bulk_docs = BulkDocs(docs=unique_ids_docs.to_dict(orient='records'))
+    print(bulk_docs)
     response = service.post_bulk_docs(
         db=db_name_only_distr, bulk_docs=bulk_docs).get_result()
 
