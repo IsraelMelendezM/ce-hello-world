@@ -53,7 +53,7 @@ def twilio_reminder(clientData:dict):
 def main():
     load_dotenv()
     CLOUDANT_URL = os.environ.get("CLOUDANT_URL")
-    CLOUDANT_API_KEY =os.environ.get("CLOUDANT_API_KEY") 
+    CLOUDANT_API_KEY = os.environ.get("CLOUDANT_API_KEY") 
     DB = "test-distribuidores"
     authenticator = IAMAuthenticator(CLOUDANT_API_KEY)
     client = CloudantV1(authenticator=authenticator)
