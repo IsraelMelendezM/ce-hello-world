@@ -6,6 +6,8 @@ import os
 from dotenv import load_dotenv
 from ibmcloudant.cloudant_v1 import CloudantV1
 from cronJob_uploadUniqueClientInfo import save_data_Cloudant,\
+                                        get_client_data, \
+                                        get_credit_data, \
                                     delete_all_documents,\
                                         get_unique_clients_latest_data
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
@@ -38,6 +40,10 @@ class TestSaveDataCloudant(unittest.TestCase):
         cls.authenticator = IAMAuthenticator(apikey=credentials['CLOUDANT_API_KEY'])
         cls.service = CloudantV1(authenticator=cls.authenticator)
         cls.service.set_service_url(credentials['CLOUDANT_URL'])
+    # def getCreditData(self, client_id):
+    #     src_path = r"test.csv"
+    #     credit_data = get_credit_data(src_path)
+
 
     def setUp(self):
         self.mock_credit_data1 =  {'status': 1, 'available_footwear': 151034.19, 'available_financial': 57869.8, 'available_credit_line': 119034.19, 'current_loan': 41600, 'current_loan_detail': {'dateStart': '2023-09-21', 'numberPurchase': '21256621', 'amountPurchase': '32000.00', 'interest': '9600.00', 'purchaseAmountTotal': 41600, 'loanTerm': '12', 'numberAmortization': '8', 'numberAmortizationLoanTerm': '8/12', 'due': 17331, 'paymentAmount': 3467, 'dateEnd': '2024-03-20', 'paymentDates': ['2023-10-20', '2023-10-22', '2023-10-22', '2023-11-06', '2023-11-06', '2023-11-07', '2023-11-21', '2023-11-21', '2023-12-06', '2023-12-06', '2023-12-06', '2023-12-20', '2023-12-20', '2023-12-20', '2024-01-05', '2024-01-05', '2024-01-05', '2024-01-21', '2024-01-21']}, 'has_have_loan': 1, 'can_have_loan': 0, 'loan_options': [], 'credit_type': 'Tradicional', 'credit_score_name': '', 'credit_line': 352000, 'credit_status': 3, 'financial_credit_line': 211200, 'toPay': 28973, 'released': 33435.78, 'discount': 4462.78, 'cutoff_date': '2024-01-20', 'payment_date': '2024-02-05', 'distributor': 'SOFIA MENA GUERRERO', 'period': [{'number': 457, 'charged': 33435.78, 'balance': 33435.78, 'discount': 4462.78, 'balanceDiscount': 28973.01, 'payed': 0, 'maxDueDaysForDiscount': 0, 'percentDiscount': 13.35}], 'insurance_folio': '620006', 'distributor_insurance': '216.96', 'insurance_benefits': {'items': [{'name': 'Seguro de vida'}, {'name': 'Servicio funeral directo ¡NUEVO!'}, {'name': 'Seguro contra robo hasta $50,000'}]}, 'free_footwear': 0, 'financial_balance': 0}

@@ -95,10 +95,10 @@ def get_credit_data(src_path):
     responses = []
 
     for payload in payloads:
-        try:
-            response = send_post_request(url, payload, headers) 
-        except:
-            response = f"Credit data: Error getting data for {payload}" 
+        # try:
+        response = send_post_request(url, payload, headers) 
+        # except:
+        #     response = f"Credit data: Error getting data for {payload}" 
         responses.append(response)
 
     return responses 
