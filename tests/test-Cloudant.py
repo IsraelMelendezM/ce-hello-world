@@ -18,11 +18,7 @@ from dotenv import  load_dotenv
 
 load_dotenv()
 
-credentials = {'CLOUDANT_API_KEY':os.environ.get("CLOUDANT_API_KEY"),
-                'CLOUDANT_URL':os.environ.get("CLOUDANT_URL")}
-authenticator = IAMAuthenticator(apikey=credentials['CLOUDANT_API_KEY'])
-service = CloudantV1(authenticator=authenticator)
-service.set_service_url(credentials['CLOUDANT_URL'])
+
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
