@@ -23,7 +23,7 @@ credentials = {'CLOUDANT_API_KEY':os.environ.get("CLOUDANT_API_KEY"),
                 'CLOUDANT_URL':os.environ.get("CLOUDANT_URL")}
         
 ct = datetime.datetime.now()
-logger.info("current time:-", ct)
+logger.info("current time:-", str(ct))
 authenticator = IAMAuthenticator(apikey=credentials['CLOUDANT_API_KEY'])
 
 # Create an instance of the Cloudant service with the authenticator
@@ -38,7 +38,8 @@ def send_post_request(url, data, headers):
 
 def read_csv_clients(src_path):
     df = pd.read_csv(src_path)
-    return df.NUMBER.str.values.tolist()
+    df.NUMBER = df.NUMBER.astype(str)
+    return df.NUMBER.values.tolist()
 
 def get_client_data(src_path):
 
@@ -106,7 +107,7 @@ def get_credit_data(src_path):
 def save_data_Cloudant(client_APIdata: list, credit_APIdata:list, prod:bool):
     # ct stores current time
     ct = datetime.datetime.now()
-    logger.info("current time:-", ct)
+    logger.info("current time:-", str(ct))
 
     logger.info(client_APIdata, credit_APIdata)
     records = []
@@ -114,7 +115,8 @@ def save_data_Cloudant(client_APIdata: list, credit_APIdata:list, prod:bool):
         # logger.info(client)
         client_credit = (client, credit) 
 
-        logger.info(client_credit)
+        logger.debug("client_credit tuple", client_credit)
+        logging.debug("client credit 0",client_credit[0])
         document: Document = Document()
         document.Type = "Cliente"
         document.Record = {
@@ -136,7 +138,7 @@ def save_data_Cloudant(client_APIdata: list, credit_APIdata:list, prod:bool):
             "should_pay_by": client_credit[1]["payment_date"]
                 }
         records.append(document)
-    logger.info(records)
+    # logger.info("records:", records)
     if prod:
         bulk_docs = BulkDocs(docs=records)
         response = service.post_bulk_docs(
