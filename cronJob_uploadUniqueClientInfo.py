@@ -97,6 +97,7 @@ def get_credit_data(src_path):
     responses = []
 
     for payload in payloads:
+        print(payload)
         try:
             response = send_post_request(url, payload, headers) 
         except:
