@@ -19,9 +19,12 @@ app = FastAPI()
 class EngineRequest(BaseModel):
     case:str
     id: str = "0070055874"
-    phoneNo: str = "8110423455"
+    phoneNo: str = "8180202938"
     otp: int = 1234
 
+load_dotenv()
+
+DB = os.environ.get("DB")
 
 @app.get("/")
 async def root():
@@ -34,7 +37,7 @@ def clientData(data):
     except Exception as err:
         return(err)
     # logger.debug("DISTRIBUTOR ID",  data)
-    doc = service.get_doc_by_key(dbName='test-distribuidores',
+    doc = service.get_doc_by_key(dbName=DB,
                             ddoc='clientes',
                             key=data["id"],
                             view='daily_record')
@@ -119,22 +122,40 @@ def auth(data):
     else:
         authenticated = True
         validationMsg = "OTP Validated"
-        # if data["id"]:
-        #     # Se manda auth a Cloudant BD
-        #     client = GetClientDetails()
-        #     doc = client.get_doc_by_key(dbName='test-distribuidores',
-        #                         ddoc='clientes',
-        #                         key=data["id"],
-        #                         view='daily_record')
-        #     doc["auth"] = True
 
-        #     client.update_document(db='test-distribuidores',
-        #                                     document=doc)   
+        ###
+        if data["id"]:
+            # Se manda auth a Cloudant BD
+            client = GetClientDetails()
+            doc = client.get_doc_by_key(dbName=DB,
+                                ddoc='clientes',
+                                key=data["id"],
+                                view='daily_record')
+            doc["auth"] = True
+
+            client.update_document(db=DB,
+                                            document=doc)   
+            #####
     return {
         "phone_no": phoneNo,
         "authentication": authenticated,
         "validation_msg": validationMsg
     }
+
+def satisfaction_survey(data):
+    print(data["id"])
+    if data["id"]:
+    # Se manda auth a Cloudant BD
+        client = GetClientDetails()
+        doc = client.get_doc_by_key(dbName=DB,
+                            ddoc='clientes',
+                            key=data["id"],
+                            view='daily_record')
+        doc["satisfaction"] = 1
+
+        client.update_document(db=DB,
+                                        document=doc)   
+
 
 @app.post("/engine")
 async def engine(request_data: EngineRequest):
@@ -151,6 +172,7 @@ async def engine(request_data: EngineRequest):
         data = {'id':id}
         try:
             inp_post_response =  clientData( data)
+            print(inp_post_response)
             return inp_post_response
             
         except Exception as e:
@@ -166,7 +188,7 @@ async def engine(request_data: EngineRequest):
              return {"error": str(e)}
         
     elif case == "auth":
-        data = {"phoneNo": str(phoneNo), "otp": int(otp)}
+        data = {"phoneNo": str(phoneNo), "otp": int(otp), "id":str(id)}
 
         try:
             inp_post_response =  auth(data)
@@ -174,7 +196,15 @@ async def engine(request_data: EngineRequest):
             
         except Exception as e:
              return {"error": str(e)}
-                 
+        
+    elif case== "satisfaction_survey":
+        data = {"id": id}
+        try:
+            inp_post_response =  satisfaction_survey(data)
+            return inp_post_response
+        
+        except Exception as e:
+             return {"error": str(e)}      
     else:
          return {"error": "No cases ran."}
     

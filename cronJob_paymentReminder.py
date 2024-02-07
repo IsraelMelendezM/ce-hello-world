@@ -54,7 +54,7 @@ def main():
     load_dotenv()
     CLOUDANT_URL = os.environ.get("CLOUDANT_URL")
     CLOUDANT_API_KEY = os.environ.get("CLOUDANT_API_KEY") 
-    DB = "test-distribuidores"
+    DB = os.environ.get("DB") 
     authenticator = IAMAuthenticator(CLOUDANT_API_KEY)
     service = CloudantV1(authenticator=authenticator)
     service.set_service_url(CLOUDANT_URL)
@@ -72,16 +72,18 @@ def main():
     df = pd.DataFrame(docs)
     clientData = df.to_dict(orient='records')
     print(df)
+    i = 0
     for doc in clientData:
 
         try: 
             # print(doc)
-            due_date = datetime.strptime(doc["should_pay_by"], "%Y-%m-%d")- timedelta(days=2)
-            todays_date = datetime.now()
+            due_date = datetime.strptime(doc["should_pay_by"], "%Y-%m-%d")
+            todays_date = datetime.strptime(doc["date"], "%Y-%m-%d") #datetime.now()
             
-            if (due_date-todays_date).days == 0:
-                ...
-                # twilio_reminder(doc)
+            if (due_date-todays_date).days == 2:
+                twilio_reminder(doc)
+                print("contador de mensajes enviados", i+1)
+                i = i +1
         except Exception as err:
             print(err, "error sending message through Twilio")
 main()
