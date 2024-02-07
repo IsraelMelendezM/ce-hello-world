@@ -87,14 +87,14 @@ def get_credit_data(src_path):
     }
 
     # Create a list of JSON data for each POST request
-    payloads= [ {"number": f"{str(client_id)}","date":""} \
-               for client_id in client_ids
-                            ]
+    payloads= [ {"number": f"{str(client_id)}","date":""} 
+               for client_id in client_ids ]
 
     responses = []
 
     for payload in payloads:
         # try:
+        logging.debug("payload", payload)
         response = send_post_request(url, payload, headers) 
         # except:
         #     response = f"Credit data: Error getting data for {payload}" 
