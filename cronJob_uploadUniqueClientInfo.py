@@ -53,7 +53,7 @@ def get_client_data(src_path):
     # Create a list of JSON data for each POST request
     payloads= [ {
         "name": "",
-        "number": f"{client_id}",
+        "number": f"{str(client_id)}",
         "id_branch": "",
         "id_credit_score": "",
         "city": "",
