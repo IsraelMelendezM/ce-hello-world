@@ -70,7 +70,7 @@ def get_client_data(src_path):
         try:
             response = send_post_request(url, payload, headers) 
         except:
-            response =  f"Error getting data for {payload}" 
+            response =  f"Client data: Error getting data for {payload}" 
         responses.append(response)
     # logging.debug("responses", responses)
     return responses #responses.status_code
@@ -87,7 +87,7 @@ def get_credit_data(src_path):
     }
 
     # Create a list of JSON data for each POST request
-    payloads= [ {"number": f"{client_id}",
+    payloads= [ {"number": f"{str(client_id)}",
                                 "date":""
                             } for client_id in client_ids
                             ]
@@ -98,7 +98,7 @@ def get_credit_data(src_path):
         try:
             response = send_post_request(url, payload, headers) 
         except:
-            response = f"Error getting data for {payload}" 
+            response = f"Credit data: Error getting data for {payload}" 
         responses.append(response)
 
     return responses 
