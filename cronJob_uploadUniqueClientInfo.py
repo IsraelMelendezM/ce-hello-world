@@ -23,7 +23,7 @@ credentials = {'CLOUDANT_API_KEY':os.environ.get("CLOUDANT_API_KEY"),
                 'CLOUDANT_URL':os.environ.get("CLOUDANT_URL")}
         
 ct = datetime.datetime.now()
-print("current time:-", ct)
+logger.info("current time:-", ct)
 authenticator = IAMAuthenticator(apikey=credentials['CLOUDANT_API_KEY'])
 
 # Create an instance of the Cloudant service with the authenticator
@@ -43,7 +43,7 @@ def read_csv_clients(src_path):
 def get_client_data(src_path):
 
     client_ids = read_csv_clients(src_path)
-    print(client_ids)
+    logger.info(client_ids)
     # Define the URL
     url = os.environ.get("DISTRIBUTORS_URL")
     # Define the headers
@@ -103,20 +103,18 @@ def get_credit_data(src_path):
     return responses 
 
 
-def save_data_Cloudant(src_path:str, client_APIdata: list, credit_APIdata:list, prod:bool):
-    print()
+def save_data_Cloudant(client_APIdata: list, credit_APIdata:list, prod:bool):
     # ct stores current time
     ct = datetime.datetime.now()
-    print("current time:-", ct)
+    logger.info("current time:-", ct)
 
-    print(client_APIdata, credit_APIdata)
+    logger.info(client_APIdata, credit_APIdata)
     records = []
     for client, credit in zip(client_APIdata, credit_APIdata):
-        # print(client)
-        print()
+        # logger.info(client)
         client_credit = (client, credit) 
 
-        print(client_credit)
+        logger.info(client_credit)
         document: Document = Document()
         document.Type = "Cliente"
         document.Record = {
@@ -138,18 +136,17 @@ def save_data_Cloudant(src_path:str, client_APIdata: list, credit_APIdata:list, 
             "should_pay_by": client_credit[1]["payment_date"]
                 }
         records.append(document)
-    print()
-    print(records)
+    logger.info(records)
     if prod:
         bulk_docs = BulkDocs(docs=records)
         response = service.post_bulk_docs(
             db="historico", bulk_docs=bulk_docs).get_result()
-        print(response)
+        logger.info(response)
     else: 
         bulk_docs = BulkDocs(docs=records)
         response = service.post_bulk_docs(
             db="test-historico", bulk_docs=bulk_docs).get_result()
-        print(response)
+        logger.info(response)
         
 def delete_all_documents(prod):
     if prod:
@@ -160,7 +157,7 @@ def delete_all_documents(prod):
     # Delete each document
     for doc in documents['rows']:
         doc_id = doc['id']
-        print(doc_id)
+        logger.info(doc_id)
         if "_design" in doc_id:
                 continue
         else:
@@ -173,7 +170,7 @@ def delete_all_documents(prod):
                 rev=rev
             ).get_result()
             time.sleep(0.1)
-            print(f"Deleted document {doc_id} - {response}")
+            logger.info(f"Deleted document {doc_id} - {response}")
 
 def get_unique_clients_latest_data(prod):
     if prod:
@@ -204,58 +201,50 @@ def get_unique_clients_latest_data(prod):
     unique_ids_docs['upload_ts'] = unique_ids_docs['upload_ts'].astype(str)
     unique_ids_docs['date'] = unique_ids_docs['date'].astype(str)
 
-    print(unique_ids_docs)
+    logger.info(unique_ids_docs)
     bulk_docs = BulkDocs(docs=unique_ids_docs.to_dict(orient='records'))
-    print(bulk_docs)
+    logger.info(bulk_docs)
     response = service.post_bulk_docs(
         db=db_name_only_distr, bulk_docs=bulk_docs).get_result()
-
-# var/sftp/uploads/
-if __name__ == "__main__":
-
-    ## get list of clients from csv
-    parser = argparse.ArgumentParser(description='Script for production and non-production flags')
     
+# var/sftp/uploads/
+def main():
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger()
+
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Script for production and non-production flags')
     parser.add_argument('--prod', action='store_true', help='Run in production mode')
     parser.add_argument('--nonprod', action='store_true', help='Run in non-production mode')
     args = parser.parse_args()
 
     if args.prod and args.nonprod:
-        print("Error: Both production and non-production flags cannot be specified simultaneously.")
+        logger.info("Error: Both production and non-production flags cannot be specified simultaneously.")
+        return
 
     if args.prod:
-        print("Running in production mode")
-        ## get client data
+        logger.info("Running in production mode")
         src_path = r"/home/sftp_dportenis/DISTRIBUIDORES.csv"
-
-        ## get API DATA
-        client_data = get_client_data(src_path)
-        credit_data = get_credit_data(src_path)
-
-        # save historico data
-        save_data_Cloudant(src_path, client_data, credit_data, args.prod, service)
-        ### delete current distribuidores db 
-        delete_all_documents(args.prod)
-        ### get most recent data from historic db
-        ## and save unique to distribuidores db
-        get_unique_clients_latest_data(args.prod)
-
     elif args.nonprod:
-        print("Running in non-production mode")
-        ## get DEMO client numbers
-        # src_path = r"/home/sftp_dportenis/test.csv"
+        logger.info("Running in non-production mode")
         src_path = r"test.csv"
-        ## get API DATA
-        client_data = get_client_data(src_path)
-        credit_data = get_credit_data(src_path)
-        # save historico data
-        save_data_Cloudant(src_path, client_data, credit_data, args.nonprod)
-
-        ### delete current distribuidores db 
-        delete_all_documents(args.nonprod)
-        # ### get most recent data from historic db
-        # ## and save unique to distribuidores db
-        get_unique_clients_latest_data(args.nonprod)
-
     else:
-        print("No mode specified. Use either --prod or --nonprod.")
+        logger.info("No mode specified. Use either --prod or --nonprod.")
+        return
+
+    # Get client and credit data
+    client_data = get_client_data(src_path)
+    credit_data = get_credit_data(src_path)
+
+    # Save historical data
+    save_data_Cloudant(client_data, credit_data, args.prod if args.prod else args.nonprod)
+
+    # Delete current distribuidores db
+    delete_all_documents(args.prod if args.prod else args.nonprod)
+
+    # Get most recent data from historic db and save unique to distribuidores db
+    get_unique_clients_latest_data(args.prod if args.prod else args.nonprod)
+
+if __name__ == "__main__":
+    main()

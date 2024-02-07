@@ -56,10 +56,10 @@ def main():
     CLOUDANT_API_KEY = os.environ.get("CLOUDANT_API_KEY") 
     DB = "test-distribuidores"
     authenticator = IAMAuthenticator(CLOUDANT_API_KEY)
-    client = CloudantV1(authenticator=authenticator)
-    client.set_service_url(CLOUDANT_URL)
+    service = CloudantV1(authenticator=authenticator)
+    service.set_service_url(CLOUDANT_URL)
 
-    response = client.post_all_docs(
+    response = service.post_all_docs(
         db=DB,
         include_docs=True,
         ).get_result()
