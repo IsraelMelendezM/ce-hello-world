@@ -37,8 +37,8 @@ def send_post_request(url, data, headers):
     return response.json() #esponse.status_code, 
 
 def read_csv_clients(src_path):
-    df = pd.read_csv(src_path)
-    df.NUMBER = df.NUMBER.astype(str)
+    dtype_dic= { 'NUMBER':str, }
+    df = pd.read_csv(src_path,dtype = dtype_dic)
     return df.NUMBER.values.tolist()
 
 def get_client_data(src_path):
