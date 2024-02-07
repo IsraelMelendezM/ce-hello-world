@@ -40,7 +40,7 @@ def twilio_reminder(clientData:dict):
     to = "whatsapp:" + number
     from_ = "whatsapp:"+os.environ.get("TRIAL_NUMBER")
     msg = f"""¡Hola {nombre}! Como recordatorio debes una cantidad de: ${dinero} MXN para el día {fecha}.
-    ¿Te redirijo a la app para pagar de una vez?"""
+    ¿Te redirijo a la app para pagar de una vez?""" # this last part wont be included
 
     try:
         message = twilio_client.messages.create(to=to, from_=from_, body=msg)
