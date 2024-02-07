@@ -38,7 +38,7 @@ def send_post_request(url, data, headers):
 
 def read_csv_clients(src_path):
     df = pd.read_csv(src_path)
-    return df.NUMBER.values.tolist()
+    return df.NUMBER.str.values.tolist()
 
 def get_client_data(src_path):
 
