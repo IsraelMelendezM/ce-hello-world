@@ -156,7 +156,7 @@ def satisfaction_survey(data):
             doc["satisfaction"] = data["satisfaction"]
         client.update_document(db=DB,
                                         document=doc)   
-
+    return {"satisfaction": data["satisfaction"]}
 
 @app.post("/engine")
 async def engine(request_data: EngineRequest):
