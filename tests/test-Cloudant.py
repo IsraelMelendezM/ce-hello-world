@@ -2,6 +2,7 @@
 import sys
 sys.path.append('../')
 import unittest
+from unittest import mock, TestCase
 import os
 from dotenv import load_dotenv
 from ibmcloudant.cloudant_v1 import CloudantV1
@@ -81,6 +82,17 @@ class TestSaveDataCloudant(unittest.TestCase):
                             credit_APIdata, prod=False)
         delete_all_documents(False)
         get_unique_clients_latest_data(False)
-        
+
+    # def test_save_data_cloudant_production_scenario1(self):
+    #     with mock.patch('cronJob_uploadUniqueClientInfo.save_data_Cloudant') as mock_save_data:
+    #         save_data_Cloudant([self.mock_client_data1], [self.mock_credit_data1], prod=False)
+    #         mock_save_data.assert_called_once_with([self.mock_client_data1], [self.mock_credit_data1], prod=False)
+
+    # def test_save_data_cloudant_production_scenario2(self):
+    #     with mock.patch('cronJob_uploadUniqueClientInfo.save_data_Cloudant') as mock_save_data:
+    #         save_data_Cloudant([self.mock_client_data2], [self.mock_credit_data2], prod=False)
+    #         mock_save_data.assert_called_once_with([self.mock_client_data2], [self.mock_credit_data2], prod=False)
+
+
 if __name__ == '__main__':
     unittest.main()
