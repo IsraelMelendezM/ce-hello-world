@@ -49,16 +49,22 @@ class TestSaveDataCloudant(unittest.TestCase):
         self.mock_client_data3 = {'status': 1, 'total': 1, 'distributors': [{'number': '0070000599', 'distributor': 'PETRA GARCIA PERAZA', 'email': 'Test@hotmail.com', 'branch': 'MAZATLAN CENTRO', 'city': 0, 'state': 0, 'reference_banorte': '072744030006203000', 'credit_score': '', 'addresses': [{'id_address': '1748381', 'street': 'C. PRIVADA DUMBO', 'house_number': 'S/N', 'apartment_number': '7', 'zipcode': '82030', 'neighborhood': 'MONTUOSA', 'settlement': 'MAZATLÁN', 'city': 'MAZATLÁN', 'state': 'SINALOA', 'residence_time': 0, 'current': '1', 'concat': 'C.PRIVADADUMBOS/N'}], 'phones': [{'number': '6691228249', 'type': 'Celular'}]}]}
                 
     def test_save_data_cloudant_production_scenario1(self):
-        save_data_Cloudant( [self.mock_credit_data1],
-                            [self.mock_client_data1], prod=False)
+        save_data_Cloudant( 
+                            [self.mock_client_data1],
+            [self.mock_credit_data1],
+                              prod=False)
         
     def test_save_data_cloudant_production_scenario2(self):
-        save_data_Cloudant( [self.mock_credit_data2],
-                            [self.mock_client_data2], prod=False)
+        save_data_Cloudant( 
+                            [self.mock_client_data2],
+            [self.mock_credit_data2],
+                              prod=False)
         
     def test_save_data_cloudant_production_scenario3(self):
-        save_data_Cloudant( [self.mock_credit_data3],
-                            [self.mock_client_data3], prod=False)
+        save_data_Cloudant( 
+                            [self.mock_client_data3],
+            [self.mock_credit_data3],
+                              prod=False)
         
     def test_update_data_cloudant_production(self):
         delete_all_documents(False)
