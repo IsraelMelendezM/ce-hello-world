@@ -26,6 +26,7 @@ class EngineRequest(BaseModel):
 load_dotenv()
 
 DB = os.environ.get("DB")
+DB_HIST = os.environ.get("DB_HIST")
 
 @app.get("/")
 async def root():
@@ -148,10 +149,10 @@ def satisfaction_survey(data):
     if data["id"]:
     # Se manda auth a Cloudant BD
         client = GetClientDetails()
-        doc = client.get_doc_by_key(dbName=DB,
+        doc = client.get_doc_by_key_max_hist(dbName=DB_HIST,
                             ddoc='clientes',
                             key=data["id"],
-                            view='daily_record')
+                            view='historical')
         if data["satisfaction"]:
             doc["satisfaction"] = data["satisfaction"]
         client.update_document(db=DB,

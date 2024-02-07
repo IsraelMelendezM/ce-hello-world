@@ -5,6 +5,11 @@ from ibmcloudant.cloudant_v1 import CloudantV1
 import os
 from dotenv import load_dotenv
 
+load_dotenv()
+
+DB = os.environ.get("DB")
+DB_HIST = os.environ.get("DB_HIST")
+
 def offset_days(dt:datetime = None, days:int =0):
     return dt + timedelta(days=days)
 
@@ -98,10 +103,34 @@ class GetClientDetails:
             raise Exception('get_doc_by_key: Problem getting document by id from view')
             
         return _result
+    
+    def get_doc_by_key_max_hist(self, dbName, ddoc, key, view):
+
+        try:
+            _response = self.client.post_view(
+                db=dbName,
+                ddoc=ddoc,
+                view=view,
+                include_docs=True,
+                key=key
+                )
+            if _response.status_code == 200:
+                if len(_response.result['rows']) > 0:
+                    _result = _response.result['rows']
+                else:
+                    _result = None
+            else:
+                print('post_view failed finding the wdn_id')
+                #log more data
+        except Exception as err:
+            print(f'ApiException getting value {err}')
+            raise Exception('get_doc_by_key: Problem getting document by id from view')
+            
+        return _result
     def update_document(self, document, db='test-distribuidores'):
         try:
             _response = self.client.post_document( 
-                                                  db="test-distribuidores",
+                                                  db=DB,
                                                   document=document).get_result()
             # print(_response)
             return _response
