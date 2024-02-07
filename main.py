@@ -21,6 +21,7 @@ class EngineRequest(BaseModel):
     id: str = "0070055874"
     phoneNo: str = "8180202938"
     otp: int = 1234
+    satisfaction: int = 0
 
 load_dotenv()
 
@@ -151,8 +152,8 @@ def satisfaction_survey(data):
                             ddoc='clientes',
                             key=data["id"],
                             view='daily_record')
-        doc["satisfaction"] = 1
-
+        if data["satisfaction"]:
+            doc["satisfaction"] = data["satisfaction"]
         client.update_document(db=DB,
                                         document=doc)   
 
@@ -167,6 +168,7 @@ async def engine(request_data: EngineRequest):
     id = request_data.id
     phoneNo = request_data.phoneNo
     otp = request_data.otp
+    satisfaction = request_data.satisfaction
 
     if case == "get_client_details":
         data = {'id':id}
@@ -198,7 +200,7 @@ async def engine(request_data: EngineRequest):
              return {"error": str(e)}
         
     elif case== "satisfaction_survey":
-        data = {"id": id}
+        data = {"id": id, "satisfaction": satisfaction}
         try:
             inp_post_response =  satisfaction_survey(data)
             return inp_post_response
