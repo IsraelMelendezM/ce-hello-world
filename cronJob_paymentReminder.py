@@ -2,7 +2,7 @@ import os
 from twilio.rest import Client
 from ibmcloudant.cloudant_v1 import CloudantV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import pandas as pd
 
 from dotenv import load_dotenv
@@ -82,6 +82,7 @@ def main():
             
             if (due_date-todays_date).days == 2:
                 twilio_reminder(doc)
+                print(f"[INFO] Recordatorio enviado hoy:", date.today(), "\n Record de la persona: ", doc )
                 print("contador de mensajes enviados", i+1)
                 i = i +1
         except Exception as err:
