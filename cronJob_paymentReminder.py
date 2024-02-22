@@ -29,8 +29,9 @@ def twilio_reminder(clientData:dict):
     auth_token = os.environ.get("TWILIO_AUTH_TOKEN") # Israel Enterprise account
     twilio_client = Client(account_sid, auth_token)
     #
+    print(clientData["should_pay_by"])
     formatted_date = datetime.strptime(clientData["should_pay_by"], "%Y-%m-%d")
-
+    print(formatted_date)
     fecha = as_spanish(formatted_date)
     dinero = clientData["toPayAfterDiscount"]
     nombre = clientData["name"].split(" ")[0]
@@ -79,6 +80,7 @@ def main():
             # print(doc)
             due_date = datetime.strptime(doc["should_pay_by"], "%Y-%m-%d")
             todays_date = datetime.strptime(doc["date"], "%Y-%m-%d") #datetime.now()
+            print("debe pagar antes de:",due_date," fecha hoy:", todays_date, "dias faltantes a fecha pago:", (due_date-todays_date).days)
             
             if (due_date-todays_date).days == 2:
                 twilio_reminder(doc)
