@@ -1,0 +1,15 @@
+                                  _id  ...        date
+0    8e38336d1265255a407d63fac30002ae  ...  2024-02-22
+1    8e38336d1265255a407d63fac3000cc6  ...  2024-02-22
+2    8e38336d1265255a407d63fac3001296  ...  2024-02-22
+3    8e38336d1265255a407d63fac3001501  ...  2024-02-22
+4    8e38336d1265255a407d63fac3001ddc  ...  2024-02-22
+..                                ...  ...         ...
+342  a7c454c4c8f44c074da40a5a6dffc692  ...  2024-02-22
+343  a7c454c4c8f44c074da40a5a6dffd195  ...  2024-02-22
+344  a7c454c4c8f44c074da40a5a6dffda59  ...  2024-02-22
+345  a7c454c4c8f44c074da40a5a6dffe940  ...  2024-02-22
+346  a7c454c4c8f44c074da40a5a6dfff8da  ...  2024-02-22
+
+[347 rows x 19 columns]
+time data '' does not match format '%Y-%m-%d' error sending message through Twilio
