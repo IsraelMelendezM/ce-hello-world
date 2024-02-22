@@ -1,3 +1,4 @@
+.dportenis/
 __pycache__/*
 *.json
 .env
