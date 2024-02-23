@@ -74,13 +74,16 @@ def main():
     clientData = df.to_dict(orient='records')
     print(df)
     i = 0
+    todays_date = datetime.today()
+    print(" fecha hoy:", todays_date)
     for doc in clientData:
 
         try: 
             # print(doc)
             due_date = datetime.strptime(doc["should_pay_by"], "%Y-%m-%d")
-            todays_date = datetime.strptime(doc["date"], "%Y-%m-%d") #datetime.now()
-            print("debe pagar antes de:",due_date," fecha hoy:", todays_date, "dias faltantes a fecha pago:", (due_date-todays_date).days)
+            print(doc["id"],
+                  "- debe pagar antes de:", datetime.strftime(due_date, "%Y-%m-%d"),
+                  "- dias faltantes a fecha pago:", (due_date-todays_date).days)
             
             if (due_date-todays_date).days == 2:
                 twilio_reminder(doc)
