@@ -61,7 +61,7 @@ def get_doc_by_key(
                 #log more data
         except Exception as err:
             print(f'ApiException getting value {err}')
-            raise Exception('get_doc_by_key: Problem getting document by id from view')
+            raise Exception(f'{err}, get_doc_by_key: Problem getting document by id from view')
             
         return _result
 
